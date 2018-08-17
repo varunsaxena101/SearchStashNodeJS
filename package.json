@@ -1,0 +1,37 @@
+{
+  "name": "searchstash",
+  "version": "1.0.0",
+  "description": "Save some text from a webpage and look it up later",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/varunsaxena101/Highlighter.git"
+  },
+  "author": "Varun Saxena",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/varunsaxena101/Highlighter/issues"
+  },
+  "homepage": "https://github.com/varunsaxena101/Highlighter#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "mongodb": "^2.2.16",
+    "node-fetch": "^2.1.2",
+    "schema-inspector": "^1.6.8"
+  },
+  "devDependencies": {
+    "eslint": "^5.3.0",
+    "eslint-config-google": "^0.9.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0",
+    "nodemon": "^1.17.5"
+  }
+}
