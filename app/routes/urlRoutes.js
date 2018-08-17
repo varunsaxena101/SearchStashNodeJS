@@ -9,6 +9,7 @@ module.exports = function(app, db) {
   const fetch = require('node-fetch');
   const mydb = require('../../config/db');
   const key = mydb.key;
+  const crypto = require('crypto');
 
   // Sanitization Schema
   const userSelectionSanitization = {
@@ -181,7 +182,8 @@ module.exports = function(app, db) {
         ];
 
         const update = {
-          $set: {'token': Date.now()}
+          // $set: {'token': Date.now()}
+          $set: {'token': crypto.randomBytes(48).toString('hex')}
         };
 
         const options = {
