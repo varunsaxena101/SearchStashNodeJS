@@ -182,8 +182,8 @@ module.exports = function(app, db) {
         ];
 
         const update = {
-          // $set: {'token': Date.now()}
-          $set: {'token': crypto.randomBytes(48).toString('hex')}
+          $set: {'token': Date.now()}
+          // $set: {'token': crypto.randomBytes(48).toString('hex')}
         };
 
         const options = {
