@@ -235,4 +235,25 @@ module.exports = function(app, db) {
       }
     });
   });
+
+  app.get('/health', (req, res) => {
+    res.statusCode = 200;
+    res.send('OK');
+  });
+
+  //app.use(express.static(__dirname + "/public/"));
+
+  // custom 404 response
+  app.use(function (req, res) {
+    res.type('text/plain');
+    res.status(404);
+    res.clearCookie('userkey');
+    res.send('404 - Not Found');
+  });
+  // custom 500 response
+  app.use(function (err, req, res, next) {
+    res.type('text/plain');
+    res.status(500);
+    res.send('500 - Server Error');
+  });
 };
