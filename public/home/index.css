@@ -1,0 +1,156 @@
+/*------------------------------------------------------------------*/
+/* BASIC SETUP */
+/*------------------------------------------------------------------*/
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    background-color: #fff;
+    color: #555;
+    font-family: Roboto, 'Arial', sans-serif;
+    font-weight: 300;
+    font-size: 20px; 
+    text-rendering: optimizeLegibility;
+}
+
+p {
+    font-size: 15px;
+    font-weight: 300;
+}
+
+.intro {
+    padding: 80px 0;
+    padding-left: 60px;
+    width: 100%;
+}
+
+h1 {
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 5.61rem;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+
+.intro-description {
+    margin-top: 10px;
+    font-size: 22px;
+    max-width: 600px;
+}
+
+.intro-text {
+    margin-bottom: 70px;
+}
+
+.stash {
+    background: linear-gradient(to bottom, rgba(250,251,252,1) 0%,rgba(245,246,247,1) 100%);
+    padding: 80px 0;
+    width: 100%;
+    text-align: center;
+}
+
+.description {
+    font-size: 0.9em;
+    max-width: 600px;
+    margin: 15px auto;
+    text-align: center;
+    display: block;
+}
+
+h3 {
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.img {
+    width: 70%;
+    margin: 20px 0px;
+}
+
+.highlight {
+    font-size: 1em;
+    max-width: 600px;
+    margin: 30px auto;
+    text-align: center;
+    display: block;
+    color: #3CB371
+}
+
+.search {
+    padding: 80px 0;
+    width: 100%;
+    text-align: center;
+}
+
+.footer {
+    background-color: #3CB371;
+    padding: 50px 0px;
+}
+
+.footer-text {
+    color: #fff;
+    padding-left 50px;
+    text-align: left;
+}
+
+/*------------------------------------------------------------------*/
+/* BUTTONS */
+/*------------------------------------------------------------------*/
+
+
+.btn:link,
+.btn:visited {
+    display: inline-block;
+    padding: 10px 30px;
+    font-weight: 300;
+    text-decoration: none;
+    border-radius: 200px;
+    transition: background-color 0.2s, border 0.2s, color 0.2s;
+}
+
+
+.btn-full:link,
+.btn-full:visited {
+    background-color: #3CB371;
+    color: #fff;
+    border: 1px solid #3CB371;
+    margin-right: 15px;
+    
+}
+
+.btn-ghost:link,
+.btn-ghost:visited {
+    border: 1px solid #3CB371;
+    color: #3CB371;
+}
+
+.btn:hover,
+.btn:active {
+    background-color: #2f915b; 
+}
+
+
+.btn-full:hover,
+.btn-full:active {
+    border: 1px solid #2f915b;
+    
+}
+
+.btn-ghost:hover,
+.btn-ghose:active {
+    border: 1px solid #2f915b;
+    color: #fff;
+}
+
+.final-btn {
+    margin: 80px 0px;
+}
