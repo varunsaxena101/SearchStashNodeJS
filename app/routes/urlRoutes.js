@@ -8,7 +8,7 @@ module.exports = function(app, db) {
   const inspector = require('schema-inspector');
   const fetch = require('node-fetch');
   const mydb = require('../../config/db');
-  const key = mydb.key;
+  const key = mydb.key; // Google People API key
   const crypto = require('crypto');
 
   // Sanitization Schema
@@ -59,7 +59,8 @@ module.exports = function(app, db) {
       inspector.sanitize(userSelectionSanitization, req.body);
       const result = inspector.validate(userSelectionValidation, req.body);
       if (result.valid) {
-        db.collection('url').insert(req.body, (err, result) => {
+        // changed collection from url to stashes
+        db.collection('stashes').insert(req.body, (err, result) => {
           if (err) {
             res.statusCode = 500;
             res.send({'error': 'An error has occurred'});
@@ -105,7 +106,8 @@ module.exports = function(app, db) {
           res.statusCode = 401;
           res.send({'error': 'Unauthorized access to server'});
         } else {
-          const col = db.collection('url');
+          // const col = db.collection('url');
+          const col = db.collection('stashes')
           const mongoQuery = {
             $and: [
               {
@@ -140,7 +142,11 @@ module.exports = function(app, db) {
     }
   });
 
-  // creates and returns a token to validate requests to server
+  /*
+  * Creates and returns a SearchStash token to validate requests to the server.
+  * Also returns userInfo.
+  * Called when user logs in to SearchStash with Google
+  */
   app.get('/create-token', (req, res) => {
     const oauthToken = req.query.oauthToken;
 
@@ -215,7 +221,7 @@ module.exports = function(app, db) {
       });
   });
 
-  // remove a token from the server when the user logs out
+  // Removes a users' SearchStash access token when user logs out
   app.delete('/delete-token', (req, res) => {
     const token = req.headers.authorization;
     console.log(token);
@@ -242,6 +248,12 @@ module.exports = function(app, db) {
     res.statusCode = 200;
     res.send('OK');
   });
+
+  app.get('/test', (req, res) => {
+    console.log("This endpoint was hit.")
+    res.statusCode = 200;
+    res.send('OK');
+  })
 
   //app.use(express.static(__dirname + "/public/"));
 
