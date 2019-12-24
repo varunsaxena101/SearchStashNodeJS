@@ -2,7 +2,7 @@
 // instance and a database as arguments
 
 module.exports = function(app, db) {
-  // var ObjectID = require('mongodb').ObjectID
+  var ObjectID = require('mongodb').ObjectID
   const bodyParser = require('body-parser');
   const jsonParser = bodyParser.json();
   const inspector = require('schema-inspector');
@@ -134,11 +134,7 @@ module.exports = function(app, db) {
             ]
           };
 
-          const exclude = {
-            _id: 0
-          };
-
-          col.find(mongoQuery, exclude).toArray((err, docs) => {
+          col.find(mongoQuery).toArray((err, docs) => {
             if (err) {
               res.statusCode = 500;
               res.send();
@@ -285,7 +281,7 @@ module.exports = function(app, db) {
     const mongoQuery = {
       $and: [
         {
-          "addrURL": req.query.addrURL
+          "_id": ObjectID(req.query.docID)
         },
         {
           "userId": req.id
