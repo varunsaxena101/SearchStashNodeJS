@@ -52,6 +52,19 @@ module.exports = function(app, db) {
     }
   };
 
+  function getHeaders(req, res, next) {
+    let token = req.headers.authorization;
+    console.log(token);
+    token = token.split(' ')[1];
+    token = parseInt(token);
+    const id = req.headers['x-id'];
+    console.log(id);
+
+    req.token = token;
+    req.id = id;
+    return next();
+  }
+
   // adds an entry to the database
   app.post('/urls', jsonParser, (req, res) => {
     // const url = {url: req.body.url};
@@ -107,7 +120,7 @@ module.exports = function(app, db) {
           res.send({'error': 'Unauthorized access to server'});
         } else {
           // const col = db.collection('url');
-          const col = db.collection('stashes')
+          const col = db.collection('stashes');
           const mongoQuery = {
             $and: [
               {
@@ -242,6 +255,50 @@ module.exports = function(app, db) {
         res.send(result);
       }
     });
+  });
+
+  app.get('/get-recent-stashes', getHeaders, (req, res) => { 
+
+    console.log(req.id, req.token)
+
+    id = req.id
+
+    // const col = db.collection('users');
+    // const mongoQuery = {
+    //   'user': {$eq: id}
+    // };
+
+    // col.findOne(mongoQuery).then((result) => {
+    //   console.log(result);
+    //   if (result === null || result.token !== token) {
+    //     res.statusCode = 401;
+    //     res.send({'error': 'Unauthorized access to server'});
+    //   } else {
+    //     const col = db.collection('stashes');
+    //     const mongoQuery = {
+    //           "userId": id
+    //       };
+        
+    //     docs = db.col.find(mongoQuery).sort({_id:-1}).limit(50)
+    //     print(docs)
+    //   }
+    // });
+
+    const mongoQuery = {
+          "userId": id
+      };
+
+    // const col = db.collection('stashes')
+    db.collection('stashes').find({"userId" : id}).sort({_id:-1}).limit(50).toArray((err, docs) => {
+      if (err) {
+        res.statusCode = 500;
+        res.send();
+      } else {
+        console.log(docs);
+        res.send(docs);
+      }
+    });
+
   });
 
   app.get('/health', (req, res) => {
