@@ -263,27 +263,6 @@ module.exports = function(app, db) {
 
     id = req.id
 
-    // const col = db.collection('users');
-    // const mongoQuery = {
-    //   'user': {$eq: id}
-    // };
-
-    // col.findOne(mongoQuery).then((result) => {
-    //   console.log(result);
-    //   if (result === null || result.token !== token) {
-    //     res.statusCode = 401;
-    //     res.send({'error': 'Unauthorized access to server'});
-    //   } else {
-    //     const col = db.collection('stashes');
-    //     const mongoQuery = {
-    //           "userId": id
-    //       };
-        
-    //     docs = db.col.find(mongoQuery).sort({_id:-1}).limit(50)
-    //     print(docs)
-    //   }
-    // });
-
     const mongoQuery = {
           "userId": id
       };
@@ -296,6 +275,36 @@ module.exports = function(app, db) {
       } else {
         console.log(docs);
         res.send(docs);
+      }
+    });
+
+  });
+
+  app.delete('/delete-stash', getHeaders, (req, res) => {
+
+    const mongoQuery = {
+      $and: [
+        {
+          "addrURL": req.query.addrURL
+        },
+        {
+          "userId": req.id
+        }
+      ]
+    };
+
+    db.collection("stashes").deleteOne(mongoQuery, function(err, obj) {
+      if (err) {
+        res.statusCode = 500;
+        res.send();
+      } else {
+        if (obj.deletedCount > 0) {
+          res.statusCode = 200;
+          res.send('Document successfully deleted');
+        } else {
+          res.statusCode = 200;
+          res.send('Document not deleted');
+        }
       }
     });
 
