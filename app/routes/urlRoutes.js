@@ -52,21 +52,34 @@ module.exports = function(app, db) {
     }
   };
 
-  function getHeaders(req, res, next) {
+  function authorizeRequest(req, res, next) {
     let token = req.headers.authorization;
-    console.log(token);
     token = token.split(' ')[1];
     token = parseInt(token);
+    console.log(token);
     const id = req.headers['x-id'];
     console.log(id);
 
     req.token = token;
     req.id = id;
-    return next();
+
+    const mongoQuery = {
+      'user': {$eq: id}
+    };
+
+    db.collection('users').findOne(mongoQuery).then((result) => {
+      console.log(result);
+      if (result === null || result.token !== token) {
+        res.statusCode = 401;
+        res.send({ 'error': 'Unauthorized access to server' });
+      } else {
+        return next();
+      }
+    });
   }
 
   // adds an entry to the database
-  app.post('/urls', jsonParser, (req, res) => {
+  app.post('/add-stash', jsonParser, (req, res) => {
     // const url = {url: req.body.url};
     if (req.body) {
       inspector.sanitize(userSelectionSanitization, req.body);
@@ -78,9 +91,7 @@ module.exports = function(app, db) {
             res.statusCode = 500;
             res.send({'error': 'An error has occurred'});
           } else {
-            // res.statusCode = 600;
-            // res.setHeader('Content-Type', 'application/json');
-            // res.setHeader('x-VarunHeader', 'silly');
+            res.statusCode = 200;
             res.send(result.ops[0]);
           }
         });
@@ -95,54 +106,32 @@ module.exports = function(app, db) {
   });
 
   // Searches database for a search request
-  app.get('/urls', (req, res) => {
+  app.get('/search', authorizeRequest, (req, res) => {
     inspector.sanitize(searchSanitization, req.query);
     const result = inspector.validate(searchValidation, req.query);
     if (result.valid) {
       const query = req.query.search;
-
-      let token = req.headers.authorization;
-      console.log(token);
-      token = token.split(' ')[1];
-      token = parseInt(token);
-      const id = req.headers['x-id'];
-      console.log(id);
-
-      const col = db.collection('users');
+      const col = db.collection('stashes');
       const mongoQuery = {
-        'user': {$eq: id}
+        $and: [
+          {
+            $text: {
+              $search: query
+            }
+          },
+          {
+            "userId": id
+          }
+        ]
       };
 
-      col.findOne(mongoQuery).then((result) => {
-        console.log(result);
-        if (result === null || result.token !== token) {
-          res.statusCode = 401;
-          res.send({'error': 'Unauthorized access to server'});
+      col.find(mongoQuery).toArray((err, docs) => {
+        if (err) {
+          res.statusCode = 500;
+          res.send();
         } else {
-          // const col = db.collection('url');
-          const col = db.collection('stashes');
-          const mongoQuery = {
-            $and: [
-              {
-                $text: {
-                  $search: query
-                }
-              },
-              {
-                "userId": id
-              }
-            ]
-          };
-
-          col.find(mongoQuery).toArray((err, docs) => {
-            if (err) {
-              res.statusCode = 500;
-              res.send();
-            } else {
-              console.log(docs);
-              res.send(docs);
-            }
-          });
+          console.log(docs);
+          res.send(docs);
         }
       });
     } else {
@@ -178,7 +167,10 @@ module.exports = function(app, db) {
       .then(function(data) {
         console.log(data);
         if (data.error) {
-          throw new Error('Oauth token is not valid');
+          // throw new Error('Oauth token is not valid');
+          res.statusCode = 401;
+          res.send({'error': 'Oauth token is not valid'});
+          return;
         }
 
         // const userID = 'google:' + data.names[0].metadata.source.id;
@@ -253,7 +245,7 @@ module.exports = function(app, db) {
     });
   });
 
-  app.get('/get-recent-stashes', getHeaders, (req, res) => { 
+  app.get('/get-recent-stashes', authorizeRequest, (req, res) => { 
 
     console.log(req.id, req.token)
 
@@ -276,7 +268,7 @@ module.exports = function(app, db) {
 
   });
 
-  app.delete('/delete-stash', getHeaders, (req, res) => {
+  app.delete('/delete-stash', authorizeRequest, (req, res) => {
 
     const mongoQuery = {
       $and: [
