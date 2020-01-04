@@ -10,7 +10,7 @@ const http = require('http');
 
 const app = express();
 
-const port = 3000;
+const port = db.port || 3000;
 /*
 const privateKey = fs.readFileSync(process.argv[2], 'utf8');
 const certificate = fs.readFileSync(process.argv[3], 'utf8');
