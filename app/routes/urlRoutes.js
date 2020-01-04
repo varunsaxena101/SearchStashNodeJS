@@ -314,9 +314,9 @@ module.exports = function(app, db) {
   // custom 404 response
   app.use(function (req, res) {
     res.type('text/plain');
-    res.status(404);
+    res.status(301);
     res.clearCookie('userkey');
-    res.send('404 - Not Found');
+    res.redirect(301, mydb.redirectUrl);
   });
   // custom 500 response
   app.use(function (err, req, res, next) {
