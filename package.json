@@ -22,7 +22,7 @@
     "express": "^4.16.3",
     "mongodb": "^2.2.16",
     "node-fetch": "^2.1.2",
-    "schema-inspector": "^1.6.8"
+    "schema-inspector": "^2.0.0"
   },
   "devDependencies": {
     "eslint": "^5.3.0",
