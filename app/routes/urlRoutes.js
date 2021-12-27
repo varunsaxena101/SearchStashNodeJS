@@ -309,7 +309,7 @@ module.exports = function(app, db) {
     res.send('OK');
   })
 
-  //app.use(express.static(__dirname + "/public/"));
+  // app.use(express.static(__dirname + "/public/"));
 
   // custom 404 response
   app.use(function (req, res) {
