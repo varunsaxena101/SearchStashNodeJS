@@ -21,7 +21,7 @@
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "mongodb": "^2.2.16",
-    "node-fetch": "^2.1.2",
+    "node-fetch": "^2.6.7",
     "schema-inspector": "^1.6.8"
   },
   "devDependencies": {
