@@ -4,6 +4,7 @@ const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
 const db = require('../config/db');
 const fs = require('fs');
+const path = require('path');
 const https = require('https');
 const app = express();
 
@@ -17,6 +18,7 @@ const options = {
 const httpsServer = https.createServer(options, app);
 
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(express.static(path.join(__dirname, 'public')))
 
 // db.url = 'mongodb://localhost:27017' ;
 const client = new MongoClient(db.url);
