@@ -2,35 +2,39 @@
 const express = require('express');
 const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
-const db = require('./config/db');
+const db = require('../config/db');
 const fs = require('fs');
 const https = require('https');
-const http = require('http');
-
-
 const app = express();
 
-const port = db.port || 3000;
-/*
-const privateKey = fs.readFileSync(process.argv[2], 'utf8');
-const certificate = fs.readFileSync(process.argv[3], 'utf8');
-const credentials = {key: privateKey, cert: certificate};
-*/
+const port = db.port || 8443;
 
-// your express configuration here
+const options = {
+  key: fs.readFileSync( '../certs/searchstash.key' ),
+  cert: fs.readFileSync( '../certs/searchstash.crt' )
+};
 
-var httpServer = http.createServer(app);
-
-// const httpsServer = https.createServer(credentials, app);
+const httpsServer = https.createServer(options, app);
 
 app.use(bodyParser.urlencoded({extended: false}));
 
-MongoClient.connect(db.url, (err, database) => {
-  if (err) return console.log(err);
+// db.url = 'mongodb://localhost:27017' ;
+const client = new MongoClient(db.url);
+const dbName = 'highlighter'
 
-  require('./app/routes')(app, database);
+async function main() {
+  await client.connect();
+  console.log('Connected successfully to server');
+  const db = client.db(dbName);
+  
+  return db;
+}
 
-  httpServer.listen(port, () => {
-    console.log('We are live on ' + port);
-  });
-});
+main()
+  .then( ( database ) => {
+    require('./app/routes')(app, database);
+
+    httpsServer.listen( port );
+  })
+  .catch( err => console.log(err));
+

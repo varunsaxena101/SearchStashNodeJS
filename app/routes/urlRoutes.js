@@ -7,9 +7,10 @@ module.exports = function(app, db) {
   const jsonParser = bodyParser.json();
   const inspector = require('schema-inspector');
   const fetch = require('node-fetch');
-  const mydb = require('../../config/db');
+  const mydb = require('../../../config/db');
   const key = mydb.key; // Google People API key
   const crypto = require('crypto');
+  const express = require('express');
 
   // Sanitization Schema
   const userSelectionSanitization = {
@@ -56,25 +57,25 @@ module.exports = function(app, db) {
     let token = req.headers.authorization;
     token = token.split(' ')[1];
     token = parseInt(token);
-    console.log(token);
+  
     const id = req.headers['x-id'];
-    console.log(id);
 
     req.token = token;
     req.id = id;
-
+    
     const mongoQuery = {
       'user': {$eq: id}
     };
 
     db.collection('users').findOne(mongoQuery).then((result) => {
-      console.log(result);
-      if (result === null || result.token !== token) {
-        res.statusCode = 401;
+      if (result === null || result.token !== token) { 
+          res.statusCode = 401;
         res.send({ 'error': 'Unauthorized access to server' });
       } else {
         return next();
       }
+    }).catch( err => {
+      console.log(err)
     });
   }
 
@@ -91,8 +92,9 @@ module.exports = function(app, db) {
             res.statusCode = 500;
             res.send({'error': 'An error has occurred'});
           } else {
+            console.log(JSON.stringify(result))
             res.statusCode = 200;
-            res.send(result.ops[0]);
+            res.send('OK');
           }
         });
       } else {
@@ -120,7 +122,7 @@ module.exports = function(app, db) {
             }
           },
           {
-            "userId": id
+            "userId": req.id
           }
         ]
       };
@@ -130,7 +132,6 @@ module.exports = function(app, db) {
           res.statusCode = 500;
           res.send();
         } else {
-          console.log(docs);
           res.send(docs);
         }
       });
@@ -165,7 +166,6 @@ module.exports = function(app, db) {
       init)
       .then((response) => response.json())
       .then(function(data) {
-        console.log(data);
         if (data.error) {
           // throw new Error('Oauth token is not valid');
           res.statusCode = 401;
@@ -184,39 +184,28 @@ module.exports = function(app, db) {
           'user': {$eq: userID}
         };
 
-        const sort = [
-          ['_id', 'asc']
-        ];
-
+        const token = Date.now();
         const update = {
-          $set: {'token': Date.now()}
+          $set: {'token': token},
           // $set: {'token': crypto.randomBytes(48).toString('hex')}
         };
 
-        const options = {
-          new: true,
-          upsert: true
-        };
-
-        col.findAndModify(mongoQuery, sort, update, options, (err, result) => {
-          console.log(result);
+        col.updateOne(mongoQuery, update, { upsert: true }, (err, result) => {
           if (err) {
             res.statusCode = 500;
             res.send({'error': err});
           } else {
-            console.log(result.value);
             res.send({
               userInfo: {
                 'givenName': givenName,
                 'userID': userID, 
                 'imgSRC': imgSrc
               },
-              token: result.value.token
+              token: token
             });
           }
         });
       }).catch((err) => {
-        console.log(err);
         res.statusCode = 401;
         res.send({'Error': err.message});
       });
@@ -225,7 +214,7 @@ module.exports = function(app, db) {
   // Removes a users' SearchStash access token when user logs out
   app.delete('/delete-token', (req, res) => {
     const token = req.headers.authorization;
-    console.log(token);
+    //console.log(token);
     token = token.split(' ')[1];
     token = parseInt(token);
 
@@ -234,7 +223,8 @@ module.exports = function(app, db) {
       'token': {$eq: token},
     };
 
-    col.findOneAndDelete(mongoQuery).then((result) => {
+    col.deleteOne(mongoQuery).then((result) => {
+      console.log('deleted token')
       if (result.value != null) {
         res.send(result);
       } else {
@@ -256,12 +246,11 @@ module.exports = function(app, db) {
       };
 
     // const col = db.collection('stashes')
-    db.collection('stashes').find({"userId" : id}).sort({_id:-1}).limit(50).toArray((err, docs) => {
+    db.collection('stashes').find({"userId" : id}).sort({_id:-1}).limit(500).toArray((err, docs) => {
       if (err) {
         res.statusCode = 500;
         res.send();
       } else {
-        console.log(docs);
         res.send(docs);
       }
     });
@@ -304,12 +293,9 @@ module.exports = function(app, db) {
   });
 
   app.get('/test', (req, res) => {
-    console.log("This endpoint was hit.")
     res.statusCode = 200;
     res.send('OK');
   })
-
-  // app.use(express.static(__dirname + "/public/"));
 
   // custom 404 response
   app.use(function (req, res) {
